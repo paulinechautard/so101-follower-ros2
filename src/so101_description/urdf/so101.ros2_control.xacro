@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="so101_joint" params="name initial_position:=0.0">
+    <joint name="${name}">
+      <command_interface name="position"/>
+      <state_interface name="position">
+        <param name="initial_value">${initial_position}</param>
+      </state_interface>
+      <state_interface name="velocity">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="so101_ros2_control" params="name">
+    <ros2_control name="${name}" type="system">
+      <hardware>
+        <plugin>mock_components/GenericSystem</plugin>
+      </hardware>
+      <xacro:so101_joint name="shoulder_pan"/>
+      <xacro:so101_joint name="shoulder_lift"/>
+      <xacro:so101_joint name="elbow_flex"/>
+      <xacro:so101_joint name="wrist_flex"/>
+      <xacro:so101_joint name="wrist_roll"/>
+      <xacro:so101_joint name="gripper"/>
+    </ros2_control>
+  </xacro:macro>
+
+</robot>

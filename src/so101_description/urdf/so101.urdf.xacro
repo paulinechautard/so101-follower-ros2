@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="so101">
+
+  <xacro:include filename="$(find so101_description)/urdf/so101_new_calib.urdf"/>
+  <xacro:include filename="$(find so101_description)/urdf/so101.ros2_control.xacro"/>
+
+  <xacro:so101_ros2_control name="so101"/>
+
+</robot>

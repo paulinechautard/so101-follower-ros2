@@ -33,6 +33,26 @@ ros2 launch so101_description display.launch.py
 
 Opens RViz and a slider window with one slider per joint.
 
+## Run with mock hardware
+
+```bash
+ros2 launch so101_bringup so101.launch.py          # rviz:=false for headless
+```
+
+Starts ros2_control with mock hardware (commands are echoed back as states)
+and three controllers: `joint_state_broadcaster`, `arm_controller`
+(JointTrajectoryController on the 5 arm joints) and `gripper_controller`
+(GripperActionController on `gripper`). Try them:
+
+```bash
+ros2 action send_goal /arm_controller/follow_joint_trajectory control_msgs/action/FollowJointTrajectory \
+  "{trajectory: {joint_names: [shoulder_pan, shoulder_lift, elbow_flex, wrist_flex, wrist_roll],
+    points: [{positions: [0.5, -0.3, 0.4, 0.2, -0.5], time_from_start: {sec: 2}}]}}"
+
+ros2 action send_goal /gripper_controller/gripper_cmd control_msgs/action/ParallelGripperCommand \
+  "{command: {name: [gripper], position: [1.0]}}"
+```
+
 ## Third-party files
 
 `src/so101_description/urdf/so101_new_calib.urdf` and the STL files in
