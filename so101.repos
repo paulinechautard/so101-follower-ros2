@@ -1,5 +1,7 @@
 repositories:
   external/sts_hardware_interface:
     type: git
-    url: https://github.com/adityakamath/sts_hardware_interface.git
-    version: 409335117857ac2ef36ee1a647aa7c2e160497c5
+    # Fork of adityakamath/sts_hardware_interface, branch feat/sign-inversion-for-directions:
+    # adds the per-joint invert_direction parameter the SO-101 needs
+    url: https://github.com/paulinechautard/sts_hardware_interface.git
+    version: c4f093a4c3bdeda7779b3f4be18acf16bc6abd43

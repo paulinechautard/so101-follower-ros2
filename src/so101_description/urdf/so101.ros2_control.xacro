@@ -1,11 +1,20 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:macro name="so101_joint" params="name initial_position:=0.0">
+  <xacro:macro name="so101_joint" params="name hardware read_only:=false calib:=None">
     <joint name="${name}">
-      <command_interface name="position"/>
+      <xacro:if value="${hardware == 'real'}">
+        <param name="motor_id">${calib['id']}</param>
+        <param name="operating_mode">0</param>
+        <!-- LeRobot and the URDF: rising raw step = positive angle -->
+        <param name="invert_direction">true</param>
+        <param name="position_center_steps">${calib['range_min'] if name == 'gripper' else int(round((calib['range_min'] + calib['range_max']) / 2.0))}</param>
+      </xacro:if>
+      <xacro:unless value="${read_only}">
+        <command_interface name="position"/>
+      </xacro:unless>
       <state_interface name="position">
-        <param name="initial_value">${initial_position}</param>
+        <param name="initial_value">0.0</param>
       </state_interface>
       <state_interface name="velocity">
         <param name="initial_value">0.0</param>
@@ -14,27 +23,47 @@
   </xacro:macro>
 
   <xacro:macro name="so101_ros2_control"
-               params="name sim:=mock headless:=false wrist_camera:=false">
+               params="name hardware:=mock headless:=false wrist_camera:=false
+                       calibration:='' serial_port:=/dev/ttyACM0 read_only:=true dry_run:=false">
+    <xacro:if value="${hardware == 'real'}">
+      <xacro:if value="${calibration == ''}">
+        ${xacro.fatal("hardware 'real' needs a calibration file (LeRobot JSON)")}
+      </xacro:if>
+      <xacro:property name="calib" value="${xacro.load_yaml(calibration)}"/>
+    </xacro:if>
+    <xacro:unless value="${hardware == 'real'}">
+      <xacro:property name="calib" value="${dict()}"/>
+      <xacro:property name="read_only" value="false"/>
+    </xacro:unless>
+
     <ros2_control name="${name}" type="system">
       <hardware>
-        <xacro:if value="${sim == 'mock'}">
+        <xacro:if value="${hardware == 'mock'}">
           <plugin>mock_components/GenericSystem</plugin>
         </xacro:if>
-        <xacro:if value="${sim == 'mujoco'}">
+        <xacro:if value="${hardware == 'mujoco'}">
           <plugin>mujoco_ros2_control/MujocoSystemInterface</plugin>
           <param name="mujoco_model">$(find so101_description)/mjcf/${'scene_camera' if wrist_camera else 'scene'}.xml</param>
           <param name="headless">${'true' if headless else 'false'}</param>
         </xacro:if>
-        <xacro:unless value="${sim in ('mock', 'mujoco')}">
-          ${xacro.fatal("sim must be 'mock' or 'mujoco', got '" + sim + "'")}
+        <xacro:if value="${hardware == 'real'}">
+          <plugin>sts_hardware_interface/STSHardwareInterface</plugin>
+          <param name="serial_port">${serial_port}</param>
+          <param name="baud_rate">1000000</param>
+          <param name="enable_mock_mode">${'true' if dry_run else 'false'}</param>
+          <param name="hold_position_on_activate">true</param>
+          <param name="reset_states_on_activate">false</param>
+        </xacro:if>
+        <xacro:unless value="${hardware in ('mock', 'mujoco', 'real')}">
+          ${xacro.fatal("hardware must be 'mock', 'mujoco' or 'real', got '" + hardware + "'")}
         </xacro:unless>
       </hardware>
-      <xacro:so101_joint name="shoulder_pan"/>
-      <xacro:so101_joint name="shoulder_lift"/>
-      <xacro:so101_joint name="elbow_flex"/>
-      <xacro:so101_joint name="wrist_flex"/>
-      <xacro:so101_joint name="wrist_roll"/>
-      <xacro:so101_joint name="gripper"/>
+      <xacro:so101_joint name="shoulder_pan" hardware="${hardware}" read_only="${read_only}" calib="${calib.get('shoulder_pan')}"/>
+      <xacro:so101_joint name="shoulder_lift" hardware="${hardware}" read_only="${read_only}" calib="${calib.get('shoulder_lift')}"/>
+      <xacro:so101_joint name="elbow_flex" hardware="${hardware}" read_only="${read_only}" calib="${calib.get('elbow_flex')}"/>
+      <xacro:so101_joint name="wrist_flex" hardware="${hardware}" read_only="${read_only}" calib="${calib.get('wrist_flex')}"/>
+      <xacro:so101_joint name="wrist_roll" hardware="${hardware}" read_only="${read_only}" calib="${calib.get('wrist_roll')}"/>
+      <xacro:so101_joint name="gripper" hardware="${hardware}" read_only="${read_only}" calib="${calib.get('gripper')}"/>
     </ros2_control>
   </xacro:macro>
 

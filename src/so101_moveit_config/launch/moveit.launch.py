@@ -1,6 +1,9 @@
+"""MoveIt (move_group and RViz) on top of a running bringup.
+
+Start so101_bringup's sim.launch.py first (with rviz:=false), then this.
+"""
 from launch import LaunchDescription
-from launch.actions import (
-    DeclareLaunchArgument, GroupAction, IncludeLaunchDescription, OpaqueFunction)
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
@@ -15,8 +18,7 @@ def launch_moveit(context):
         .robot_description(mappings={'wrist_camera': wrist_camera})
         .to_moveit_configs()
     )
-    use_sim_time = {
-        'use_sim_time': LaunchConfiguration('sim').perform(context) == 'mujoco'}
+    use_sim_time = {'use_sim_time': LaunchConfiguration('use_sim_time')}
 
     move_group = Node(
         package='moveit_ros_move_group',
@@ -44,31 +46,15 @@ def launch_moveit(context):
 
 
 def generate_launch_description():
-    bringup = GroupAction(scoped=True, actions=[IncludeLaunchDescription(
-        PathJoinSubstitution(
-            [FindPackageShare('so101_bringup'), 'launch', 'so101.launch.py']),
-        launch_arguments={
-            'rviz': 'false',  # we start our own RViz with the MoveIt config
-            'wrist_camera': LaunchConfiguration('wrist_camera'),
-            'sim': LaunchConfiguration('sim'),
-            'headless': LaunchConfiguration('headless'),
-        }.items(),
-    )])
-
     return LaunchDescription([
         DeclareLaunchArgument('rviz', default_value='true', description='Start RViz'),
         DeclareLaunchArgument(
             'wrist_camera', default_value='true',
-            description='Add the wrist camera and its mount to the model',
+            description='Must match the bringup: include the wrist camera in the model',
         ),
         DeclareLaunchArgument(
-            'sim', default_value='mock', choices=['mock', 'mujoco'],
-            description='mock: commands echoed back as states. mujoco: MuJoCo physics',
+            'use_sim_time', default_value='false',
+            description='true when the bringup runs MuJoCo (sim:=mujoco)',
         ),
-        DeclareLaunchArgument(
-            'headless', default_value='false',
-            description='sim:=mujoco only: run without the MuJoCo viewer window',
-        ),
-        bringup,
         OpaqueFunction(function=launch_moveit),
     ])
