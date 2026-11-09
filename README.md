@@ -61,13 +61,25 @@ ros2 action send_goal /gripper_controller/gripper_cmd control_msgs/action/Parall
   "{command: {name: [gripper], position: [1.0]}}"
 ```
 
+## Simulate in MuJoCo
+
+```bash
+ros2 launch so101_bringup so101.launch.py sim:=mujoco    # headless:=true for no viewer
+```
+
+Same controllers as above, but MuJoCo plays the hardware: the arm has mass,
+gravity, joint friction and servo-like position actuators (STS3215 gains from
+SO-ARM100's MJCF), and the gripper jaw collides with objects. The commands in
+the previous section work unchanged.
+
 ## Plan with MoveIt
 
 ```bash
 ros2 launch so101_moveit_config moveit.launch.py   # rviz:=false, wrist_camera:=false
+ros2 launch so101_moveit_config moveit.launch.py sim:=mujoco   # plan and execute in MuJoCo
 ```
 
-Starts the mock-hardware bringup above (without its RViz), `move_group`, and
+Starts the bringup above (mock by default, without its RViz), `move_group`, and
 RViz with the MotionPlanning panel. Planning groups:
 
 - `arm`: chain `base_link` → `gripper_frame_link`, IK by
@@ -84,6 +96,9 @@ panel so pick_ik returns the closest pose it can reach.
 `src/so101_description/meshes/` are taken from
 [TheRobotStudio/SO-ARM100](https://github.com/TheRobotStudio/SO-ARM100),
 `Simulation/SO101/`, at commit `a758567`.
+
+`src/so101_description/mjcf/scene.xml`, `so101_new_calib.xml` and
+`so101_new_calib_camera.xml` come from the same folder and commit
 
 The wrist camera meshes, and the placement of the camera links in
 `urdf/so101_wrist_camera.xacro`, come from the same source

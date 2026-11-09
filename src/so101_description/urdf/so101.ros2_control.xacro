@@ -13,10 +13,21 @@
     </joint>
   </xacro:macro>
 
-  <xacro:macro name="so101_ros2_control" params="name">
+  <xacro:macro name="so101_ros2_control"
+               params="name sim:=mock headless:=false wrist_camera:=false">
     <ros2_control name="${name}" type="system">
       <hardware>
-        <plugin>mock_components/GenericSystem</plugin>
+        <xacro:if value="${sim == 'mock'}">
+          <plugin>mock_components/GenericSystem</plugin>
+        </xacro:if>
+        <xacro:if value="${sim == 'mujoco'}">
+          <plugin>mujoco_ros2_control/MujocoSystemInterface</plugin>
+          <param name="mujoco_model">$(find so101_description)/mjcf/${'scene_camera' if wrist_camera else 'scene'}.xml</param>
+          <param name="headless">${'true' if headless else 'false'}</param>
+        </xacro:if>
+        <xacro:unless value="${sim in ('mock', 'mujoco')}">
+          ${xacro.fatal("sim must be 'mock' or 'mujoco', got '" + sim + "'")}
+        </xacro:unless>
       </hardware>
       <xacro:so101_joint name="shoulder_pan"/>
       <xacro:so101_joint name="shoulder_lift"/>
