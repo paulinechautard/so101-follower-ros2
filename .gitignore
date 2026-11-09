@@ -1,0 +1,13 @@
+# colcon
+build/
+install/
+log/
+
+# external sources, populated by `vcs import src < so101.repos`
+src/external/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
