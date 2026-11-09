@@ -1,9 +1,16 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="so101">
 
+  <xacro:arg name="wrist_camera" default="true"/>
+
   <xacro:include filename="$(find so101_description)/urdf/so101_new_calib.urdf"/>
   <xacro:include filename="$(find so101_description)/urdf/so101.ros2_control.xacro"/>
+  <xacro:include filename="$(find so101_description)/urdf/so101_wrist_camera.xacro"/>
 
   <xacro:so101_ros2_control name="so101"/>
+
+  <xacro:if value="$(arg wrist_camera)">
+    <xacro:so101_wrist_camera parent="gripper_link"/>
+  </xacro:if>
 
 </robot>

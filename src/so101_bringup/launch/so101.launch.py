@@ -15,6 +15,7 @@ def generate_launch_description():
         Command([
             'xacro ',
             PathJoinSubstitution([description_share, 'urdf', 'so101.urdf.xacro']),
+            ' wrist_camera:=', LaunchConfiguration('wrist_camera'),
         ]),
         value_type=str,
     )
@@ -22,6 +23,10 @@ def generate_launch_description():
 
     return LaunchDescription([
         DeclareLaunchArgument('rviz', default_value='true', description='Start RViz'),
+        DeclareLaunchArgument(
+            'wrist_camera', default_value='true',
+            description='Add the wrist camera and its mount to the model',
+        ),
 
         Node(
             package='robot_state_publisher',

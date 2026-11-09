@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!--
+  Wrist camera: innomaker 1080P USB2.0 UVC 130° module (32 x 32 mm board)
+  on the 3D-printed hex-nut wrist mount.
+
+  The links, joints and meshes come from TheRobotStudio/SO-ARM100,
+  Simulation/SO101/so101_new_calib_camera.urdf, at commit a758567.
+  This file only adds the optical frame.
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="so101_wrist_camera" params="parent:=gripper_link">
+
+    <!-- The upstream URDF gives both parts the same placeholder inertia. -->
+    <link name="wrist_camera_mount_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.02"/>
+        <inertia ixx="1e-5" ixy="0" ixz="0" iyy="1e-5" iyz="0" izz="1e-5"/>
+      </inertial>
+      <!-- This mesh is in millimetres. -->
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://so101_description/meshes/wrist_camera_mount_so101_v1.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="3d_printed"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://so101_description/meshes/wrist_camera_mount_so101_v1.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- The camera board lies in the x/y plane at z=0. The lens points along +z. -->
+    <link name="wrist_camera_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.015"/>
+        <inertia ixx="1e-5" ixy="0" ixz="0" iyy="1e-5" iyz="0" izz="1e-5"/>
+      </inertial>
+      <!-- This mesh is in metres. -->
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://so101_description/meshes/wrist_camera_so101_v1.stl"/>
+        </geometry>
+        <material name="sts3215"/>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://so101_description/meshes/wrist_camera_so101_v1.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <!--
+      ROS optical frame (REP 103): z forward, x right, y down in the image.
+      It sits at the front of the lens barrel (z = 26.3 mm in the mesh).
+      TODO: check the roll about z against a real image. The mesh does not show
+      which way the sensor rows run.
+    -->
+    <link name="wrist_camera_optical_frame"/>
+
+    <joint name="wrist_camera_mount_joint" type="fixed">
+      <origin xyz="-0.0150 0.0240 -0.0315" rpy="-1.5708 -0.0008 -1.5708"/>
+      <parent link="${parent}"/>
+      <child link="wrist_camera_mount_link"/>
+    </joint>
+
+    <joint name="wrist_camera_joint" type="fixed">
+      <origin xyz="-0.04941 -0.03813 0.0175" rpy="0 -1.5708 -2.0076"/>
+      <parent link="wrist_camera_mount_link"/>
+      <child link="wrist_camera_link"/>
+    </joint>
+
+    <joint name="wrist_camera_optical_joint" type="fixed">
+      <origin xyz="0 0 0.0263" rpy="0 0 0"/>
+      <parent link="wrist_camera_link"/>
+      <child link="wrist_camera_optical_frame"/>
+    </joint>
+
+  </xacro:macro>
+
+</robot>

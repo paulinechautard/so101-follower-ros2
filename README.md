@@ -8,6 +8,8 @@ ROS 2 stack for a standalone SO-101 follower arm.
   (ros2_control plugin) built from source
 - **Simulation:** MuJoCo via `mujoco_ros2_control`
 - **Motion planning:** MoveIt 2 with pick_ik, and MoveIt Servo for Cartesian teleop
+- **Wrist camera:** innomaker 1080P USB2.0 UVC 130° module on the 3D-printed
+  hex-nut wrist mount
 - **Platform:** Ubuntu 26.04, ROS 2 Lyrical (tested on WSL2)
 
 ## Setup
@@ -32,6 +34,12 @@ ros2 launch so101_description display.launch.py
 ```
 
 Opens RViz and a slider window with one slider per joint.
+
+Both launch files take `wrist_camera:=false` to leave the camera and its mount
+out of the model. With the camera, three links hang under `gripper_link`:
+`wrist_camera_mount_link`, `wrist_camera_link` and `wrist_camera_optical_frame`
+(REP 103: z out of the lens, x right, y down). The optical frame's roll about z
+has not been checked against a real image yet.
 
 ## Run with mock hardware
 
@@ -59,3 +67,13 @@ ros2 action send_goal /gripper_controller/gripper_cmd control_msgs/action/Parall
 `src/so101_description/meshes/` are taken from
 [TheRobotStudio/SO-ARM100](https://github.com/TheRobotStudio/SO-ARM100),
 `Simulation/SO101/`, at commit `a758567`.
+
+The wrist camera meshes, and the placement of the camera links in
+`urdf/so101_wrist_camera.xacro`, come from the same source
+(`so101_new_calib_camera.urdf`):
+
+- `wrist_camera_so101_v1.stl`: the innomaker 1080P USB2.0 UVC 130° module
+  (32 × 32 mm board), modelled in meters
+- `wrist_camera_mount_so101_v1.stl`: the 3D-printed hex-nut wrist mount
+  (`Optional/SO101_Wrist_Cam_Hex-Nut_Mount_32x32_UVC_Module`), modelled in
+  millimeters, so it needs `scale="0.001 0.001 0.001"`
