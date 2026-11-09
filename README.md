@@ -61,6 +61,23 @@ ros2 action send_goal /gripper_controller/gripper_cmd control_msgs/action/Parall
   "{command: {name: [gripper], position: [1.0]}}"
 ```
 
+## Plan with MoveIt
+
+```bash
+ros2 launch so101_moveit_config moveit.launch.py   # rviz:=false, wrist_camera:=false
+```
+
+Starts the mock-hardware bringup above (without its RViz), `move_group`, and
+RViz with the MotionPlanning panel. Planning groups:
+
+- `arm`: chain `base_link` → `gripper_frame_link`, IK by
+  [pick_ik](https://github.com/PickNikRobotics/pick_ik). Named state: `home`.
+- `gripper`: the `gripper` joint. Named states: `open`, `closed`.
+
+The arm has 5 DOF, so most 6D poses are out of reach. When dragging the
+interactive marker in RViz, tick *Approx IK Solutions* in the MotionPlanning
+panel so pick_ik returns the closest pose it can reach.
+
 ## Third-party files
 
 `src/so101_description/urdf/so101_new_calib.urdf` and the STL files in

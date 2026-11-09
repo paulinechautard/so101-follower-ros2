@@ -1,0 +1,17 @@
+# pick_ik parameters: https://github.com/PickNikRobotics/pick_ik/blob/main/doc/USAGE.md
+# The arm has 5 DOF, so most 6D poses cannot be reached exactly. rotation_scale < 1
+# makes the solver favour position over orientation.
+arm:
+  kinematics_solver: pick_ik/PickIkPlugin
+  kinematics_solver_timeout: 0.05
+  mode: global
+  stop_optimization_on_valid_solution: true
+  position_scale: 1.0
+  rotation_scale: 0.5
+  position_threshold: 0.001         # m
+  orientation_threshold: 0.01       # rad
+  cost_threshold: 0.001
+  approximate_solution_position_threshold: 0.01     # m
+  approximate_solution_orientation_threshold: 0.3   # rad
+  minimal_displacement_weight: 0.0
+  gd_step_size: 0.0001
