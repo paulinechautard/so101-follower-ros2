@@ -8,6 +8,7 @@
   <xacro:arg name="serial_port" default="/dev/ttyACM0"/>
   <xacro:arg name="read_only" default="true"/>
   <xacro:arg name="dry_run" default="false"/>
+  <xacro:arg name="servo_p" default="16"/>
 
   <xacro:include filename="$(find so101_description)/urdf/so101_new_calib.urdf"/>
   <xacro:include filename="$(find so101_description)/urdf/so101.ros2_control.xacro"/>
@@ -16,7 +17,8 @@
   <xacro:so101_ros2_control name="so101" hardware="$(arg hardware)" headless="$(arg headless)"
                            wrist_camera="$(arg wrist_camera)"
                            calibration="$(arg calibration)" serial_port="$(arg serial_port)"
-                           read_only="$(arg read_only)" dry_run="$(arg dry_run)"/>
+                           read_only="$(arg read_only)" dry_run="$(arg dry_run)"
+                           servo_p="$(arg servo_p)"/>
 
   <xacro:if value="$(arg wrist_camera)">
     <xacro:so101_wrist_camera parent="gripper_link"/>

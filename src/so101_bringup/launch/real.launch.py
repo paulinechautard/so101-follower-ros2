@@ -9,10 +9,11 @@ def generate_launch_description():
         PathJoinSubstitution([FindPackageShare('so101_bringup'), 'launch', 'common.launch.py']),
         launch_arguments={
             'hardware': 'real',
-            'read_only': 'true',
+            'read_only': LaunchConfiguration('read_only'),
             'calibration': LaunchConfiguration('calibration'),
             'serial_port': LaunchConfiguration('serial_port'),
             'dry_run': LaunchConfiguration('dry_run'),
+            'servo_p': LaunchConfiguration('servo_p'),
             'rviz': LaunchConfiguration('rviz'),
             'wrist_camera': LaunchConfiguration('wrist_camera'),
         }.items(),
@@ -26,6 +27,14 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'serial_port', default_value='/dev/ttyACM0',
             description='Serial port of the servo bus',
+        ),
+        DeclareLaunchArgument(
+            'read_only', default_value='true',
+            description='Torque off and joint states only. false: torque on, controllers active',
+        ),
+        DeclareLaunchArgument(
+            'servo_p', default_value='16',
+            description='Servo position P gain, written to EEPROM when not read-only. LeRobot uses 16',
         ),
         DeclareLaunchArgument(
             'dry_run', default_value='false',

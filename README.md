@@ -77,7 +77,7 @@ gravity, joint friction and servo-like position actuators (STS3215 gains from
 SO-ARM100's MJCF), and the gripper jaw collides with objects. The commands in
 the previous section work unchanged.
 
-## Run the real arm (read-only)
+## Run the real arm
 
 ```bash
 ros2 launch so101_bringup real.launch.py \
@@ -85,9 +85,18 @@ ros2 launch so101_bringup real.launch.py \
 # serial_port:=/dev/ttyACM0 (default), rviz:=false
 ```
 
-Drives the servos with [sts_hardware_interface](https://github.com/adityakamath/sts_hardware_interface),
-for now **read-only**: torque off on every servo and only `joint_state_broadcaster`
+Drives the servos with [sts_hardware_interface](https://github.com/adityakamath/sts_hardware_interface).
+By default **read-only**: torque off on every servo and only `joint_state_broadcaster`
 running, so nothing is ever commanded.
+
+With `read_only:=false`, torque goes on and the same controllers as in simulation
+start, holding the arm where it is. The driver then also writes LeRobot's servo
+settings (PID 16/0/32, and on the gripper protection current 250 and overload
+torque 25) and limits commands to each joint's calibrated range.
+
+Before `read_only:=false`, hold the arm in a pose **inside the URDF limits**: the
+folded rest pose has `shoulder_lift` below its lower limit, and the controllers
+would snap it to the limit when torque goes on.
 
 The driver also offers a `/one_key_calibration` service: **don't call it**. It
 re-centres the servo's encoder offset in EEPROM and breaks the LeRobot calibration.

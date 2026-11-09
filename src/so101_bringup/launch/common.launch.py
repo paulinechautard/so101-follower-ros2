@@ -1,8 +1,3 @@
-"""Shared bringup: robot_state_publisher, ros2_control and the controllers.
-
-Not meant to be launched directly: use sim.launch.py (mock or MuJoCo) or
-real.launch.py (the real arm).
-"""
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, Shutdown
 from launch.conditions import IfCondition
@@ -40,6 +35,7 @@ def launch_setup(context):
             ' serial_port:=', LaunchConfiguration('serial_port'),
             ' read_only:=', LaunchConfiguration('read_only'),
             ' dry_run:=', LaunchConfiguration('dry_run'),
+            ' servo_p:=', LaunchConfiguration('servo_p'),
         ]),
         value_type=str,
     )
@@ -107,6 +103,10 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'read_only', default_value='true',
             description='hardware:=real only: torque off, joint states only',
+        ),
+        DeclareLaunchArgument(
+            'servo_p', default_value='16',
+            description='hardware:=real only: servo position P gain (EEPROM), LeRobot uses 16',
         ),
         DeclareLaunchArgument(
             'dry_run', default_value='false',
