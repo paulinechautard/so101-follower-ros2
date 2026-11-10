@@ -1,0 +1,8 @@
+# Pick and place and object present in the scene
+
+string object_id
+geometry_msgs/PoseStamped place_pose
+---
+string message
+---
+string stage

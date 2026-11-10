@@ -1,0 +1,14 @@
+# mujoco_ros2_control camera plugin (sim:=mujoco with wrist_camera:=true): renders the
+# MJCF camera "wrist_camera" on the same topics as usb_cam on the real arm
+/**:
+  ros__parameters:
+    mujoco_plugins:
+      wrist_camera:
+        type: "mujoco_ros2_control_plugins/CameraPlugin"
+        camera_publish_rate: 15.0
+        wrist_camera:
+          policy: streaming
+          frame_name: wrist_camera_optical_frame
+          image_topic: /wrist_camera/image_raw
+          info_topic: /wrist_camera/camera_info
+          depth_topic: /wrist_camera/depth/image_raw

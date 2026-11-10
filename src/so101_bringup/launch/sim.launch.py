@@ -12,6 +12,7 @@ def generate_launch_description():
             'rviz': LaunchConfiguration('rviz'),
             'wrist_camera': LaunchConfiguration('wrist_camera'),
             'headless': LaunchConfiguration('headless'),
+            'world': LaunchConfiguration('world'),
         }.items(),
     )
 
@@ -31,6 +32,10 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'headless', default_value='false',
             description='sim:=mujoco only: run without the MuJoCo viewer window',
+        ),
+        DeclareLaunchArgument(
+            'world', default_value='empty', choices=['empty', 'pick_place'],
+            description="sim:=mujoco only: 'pick_place' adds a cube to grasp",
         ),
         common,
     ])

@@ -11,6 +11,7 @@ CONTROL_NODE_PACKAGE = {
     'mujoco': 'mujoco_ros2_control',
     'real': 'controller_manager',
 }
+WORLDS = ['empty', 'pick_place']  # mjcf/scene.xml, mjcf/pick_place.xml
 
 
 def launch_setup(context):
@@ -21,6 +22,8 @@ def launch_setup(context):
     if hardware not in CONTROL_NODE_PACKAGE:
         raise ValueError(
             f"hardware must be one of {list(CONTROL_NODE_PACKAGE)}, got '{hardware}'")
+    world = LaunchConfiguration('world').perform(context)
+    wrist_camera = LaunchConfiguration('wrist_camera').perform(context) == 'true'
     use_sim_time = {'use_sim_time': hardware == 'mujoco'}
     read_only = hardware == 'real' and LaunchConfiguration('read_only').perform(context) == 'true'
 
@@ -31,6 +34,7 @@ def launch_setup(context):
             ' wrist_camera:=', LaunchConfiguration('wrist_camera'),
             ' hardware:=', hardware,
             ' headless:=', LaunchConfiguration('headless'),
+            ' world:=', world,
             ' calibration:=', LaunchConfiguration('calibration'),
             ' serial_port:=', LaunchConfiguration('serial_port'),
             ' read_only:=', LaunchConfiguration('read_only'),
@@ -40,6 +44,11 @@ def launch_setup(context):
         value_type=str,
     )
     controllers = PathJoinSubstitution([bringup_share, 'config', 'controllers.yaml'])
+    mujoco_plugins = []
+    if hardware == 'mujoco':
+        mujoco_plugins.append(PathJoinSubstitution([bringup_share, 'config', 'mujoco_plugins.yaml']))
+        if wrist_camera:
+            mujoco_plugins.append(PathJoinSubstitution([bringup_share, 'config', 'mujoco_camera.yaml']))
 
     return [
         Node(
@@ -51,7 +60,7 @@ def launch_setup(context):
         Node(
             package=CONTROL_NODE_PACKAGE[hardware],
             executable='ros2_control_node',
-            parameters=[controllers, use_sim_time],
+            parameters=[controllers, *mujoco_plugins, use_sim_time],
             output='screen',
             # Closing the MuJoCo window ends the whole launch.
             on_exit=Shutdown() if hardware == 'mujoco' else None,
@@ -91,6 +100,10 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'headless', default_value='false',
             description='hardware:=mujoco only: run without the MuJoCo viewer window',
+        ),
+        DeclareLaunchArgument(
+            'world', default_value='empty', choices=WORLDS,
+            description="hardware:=mujoco only: 'empty', or 'pick_place' (adds a cube to grasp)",
         ),
         DeclareLaunchArgument(
             'calibration', default_value='',

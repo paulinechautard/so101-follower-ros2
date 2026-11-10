@@ -4,6 +4,7 @@
   <xacro:arg name="wrist_camera" default="true"/>
   <xacro:arg name="hardware" default="mock"/>
   <xacro:arg name="headless" default="false"/>
+  <xacro:arg name="world" default="empty"/>
   <xacro:arg name="calibration" default=""/>
   <xacro:arg name="serial_port" default="/dev/ttyACM0"/>
   <xacro:arg name="read_only" default="true"/>
@@ -14,7 +15,7 @@
   <xacro:include filename="$(find so101_description)/urdf/so101.ros2_control.xacro"/>
   <xacro:include filename="$(find so101_description)/urdf/so101_wrist_camera.xacro"/>
 
-  <xacro:so101_ros2_control name="so101" hardware="$(arg hardware)" headless="$(arg headless)"
+  <xacro:so101_ros2_control name="so101" hardware="$(arg hardware)" headless="$(arg headless)" world="$(arg world)"
                            wrist_camera="$(arg wrist_camera)"
                            calibration="$(arg calibration)" serial_port="$(arg serial_port)"
                            read_only="$(arg read_only)" dry_run="$(arg dry_run)"

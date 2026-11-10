@@ -1,0 +1,27 @@
+<!--
+  Wrist camera mount + innomaker 32x32 UVC module, placed as in urdf/so101_wrist_camera.xacro
+-->
+<mujoco>
+  <asset>
+    <mesh file="wrist_camera_mount_so101_v1.stl" scale="0.001 0.001 0.001"/>
+    <mesh file="wrist_camera_so101_v1.stl"/>
+    <material name="wrist_camera_mount_so101_v1_material" rgba="0.95 0.95 0.95 1"/>
+    <material name="wrist_camera_so101_v1_material" rgba="0.1 0.1 0.1 1"/>
+  </asset>
+
+  <worldbody>
+    <!-- Link wrist_camera_mount (Hex-Nut Recess, 32x32 UVC module form factor) -->
+    <body name="wrist_camera_mount" pos="-0.0150 0.0240 -0.0315" quat="0.4997981226682881 -0.5001999599912927 0.4998017973423795 -0.5001999599912927">
+      <inertial pos="0 0 0" mass="0.02" diaginertia="1e-5 1e-5 1e-5"/>
+      <geom type="mesh" class="visual" mesh="wrist_camera_mount_so101_v1" material="wrist_camera_mount_so101_v1_material"/>
+      <geom type="mesh" class="collision" mesh="wrist_camera_mount_so101_v1" material="wrist_camera_mount_so101_v1_material"/>
+      <!-- Link wrist_camera: lens points along +z -->
+      <body name="wrist_camera" pos="-0.04941 -0.03813 0.0175" quat="0.37978693649389456 -0.5964584309361936 -0.37978833153177 -0.596456240026065">
+        <inertial pos="0 0 0" mass="0.015" diaginertia="1e-5 1e-5 1e-5"/>
+        <geom type="mesh" class="visual" mesh="wrist_camera_so101_v1" material="wrist_camera_so101_v1_material"/>
+        <geom type="mesh" class="collision" mesh="wrist_camera_so101_v1" material="wrist_camera_so101_v1_material"/>
+        <camera name="wrist_camera" pos="0 0 0.0263" quat="0 1 0 0" fovy="100" resolution="640 480"/>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>
