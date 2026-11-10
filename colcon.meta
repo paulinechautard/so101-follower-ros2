@@ -1,0 +1,7 @@
+{
+  "names": {
+    "usb_cam": {
+      "cmake-args": ["-DCMAKE_CXX_FLAGS=-Wno-error=deprecated-declarations"]
+    }
+  }
+}

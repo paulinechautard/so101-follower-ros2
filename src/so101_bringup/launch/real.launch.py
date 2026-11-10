@@ -1,6 +1,8 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -17,6 +19,17 @@ def generate_launch_description():
             'rviz': LaunchConfiguration('rviz'),
             'wrist_camera': LaunchConfiguration('wrist_camera'),
         }.items(),
+    )
+
+    wrist_camera = Node(
+        package='usb_cam',
+        executable='usb_cam_node_exe',
+        namespace='wrist_camera',
+        parameters=[
+            PathJoinSubstitution([FindPackageShare('so101_bringup'), 'config', 'wrist_camera.yaml']),
+            {'video_device': LaunchConfiguration('camera_device')},
+        ],
+        condition=IfCondition(LaunchConfiguration('wrist_camera')),
     )
 
     return LaunchDescription([
@@ -43,7 +56,12 @@ def generate_launch_description():
         DeclareLaunchArgument('rviz', default_value='true', description='Start RViz'),
         DeclareLaunchArgument(
             'wrist_camera', default_value='true',
-            description='Add the wrist camera and its mount to the model',
+            description='Add the wrist camera to the model and start its driver',
+        ),
+        DeclareLaunchArgument(
+            'camera_device', default_value='/dev/video0',
+            description='V4L2 device of the wrist camera',
         ),
         common,
+        wrist_camera,
     ])

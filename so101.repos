@@ -5,3 +5,9 @@ repositories:
     # adds the per-joint invert_direction parameter the SO-101 needs
     url: https://github.com/paulinechautard/sts_hardware_interface.git
     version: c4f093a4c3bdeda7779b3f4be18acf16bc6abd43
+  external/usb_cam:
+    type: git
+    # Not released for Lyrical yet. colcon.meta lets it build despite Lyrical's
+    # deprecation warnings (it compiles with -Werror)
+    url: https://github.com/ros-drivers/usb_cam.git
+    version: 772b25f4e2e8f94f54501a32d36c3bffca56141d

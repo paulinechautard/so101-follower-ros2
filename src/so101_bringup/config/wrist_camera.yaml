@@ -1,0 +1,19 @@
+# usb_cam driver for the wrist camera (innomaker 1080P USB2.0 UVC 130°)
+/**:
+  ros__parameters:
+    video_device: /dev/video0
+    camera_name: wrist_camera
+    frame_id: wrist_camera_optical_frame
+    pixel_format: mjpeg2rgb
+    av_device_format: YUV422P
+    io_method: mmap
+    image_width: 640
+    image_height: 480
+    framerate: 30.0
+    brightness: -1
+    contrast: -1
+    saturation: -1
+    sharpness: -1
+    gain: -1
+    auto_white_balance: true
+    autoexposure: true

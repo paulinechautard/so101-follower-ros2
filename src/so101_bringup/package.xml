@@ -18,6 +18,7 @@
   <exec_depend>hardware_interface</exec_depend>  <!-- mock_components -->
   <exec_depend>mujoco_ros2_control</exec_depend>
   <exec_depend>sts_hardware_interface</exec_depend>
+  <exec_depend>usb_cam</exec_depend>
   <exec_depend>joint_state_broadcaster</exec_depend>
   <exec_depend>joint_trajectory_controller</exec_depend>
   <exec_depend>parallel_gripper_controller</exec_depend>

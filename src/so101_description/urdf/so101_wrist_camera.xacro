@@ -60,8 +60,6 @@
     <!--
       ROS optical frame (REP 103): z forward, x right, y down in the image.
       It sits at the front of the lens barrel (z = 26.3 mm in the mesh).
-      TODO: check the roll about z against a real image. The mesh does not show
-      which way the sensor rows run.
     -->
     <link name="wrist_camera_optical_frame"/>
 
