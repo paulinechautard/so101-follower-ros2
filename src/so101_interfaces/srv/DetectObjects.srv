@@ -2,7 +2,7 @@
 
 string[] object_ids  # the objects the detector knows
 ---
-bool success         
+bool success
 string message
 string[] found_ids
-geometry_msgs/PoseStamped[] poses  
+geometry_msgs/PoseStamped[] poses

@@ -22,6 +22,13 @@ colcon build --symlink-install
 source install/setup.bash
 ```
 
+Git hooks (gitleaks secret scan + basic file hygiene):
+
+```bash
+pre-commit install            # once per clone
+pre-commit run --all-files    # manual full scan
+```
+
 ## Run
 
 ```bash
@@ -89,8 +96,8 @@ camera: boxes with a size and a pose, loose with a `mass`, `visual: true` for de
 `so101_examples`, on the Python client:
 
 ```bash
-ros2 run so101_examples keeper     
-ros2 run so101_examples sorter     
+ros2 run so101_examples keeper
+ros2 run so101_examples sorter
 ```
 
 ## Third-party files
