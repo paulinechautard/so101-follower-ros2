@@ -3,6 +3,7 @@
   ros__parameters:
     video_device: /dev/video0
     camera_name: wrist_camera
+    camera_info_url: package://so101_bringup/config/wrist_camera_info.yaml
     frame_id: wrist_camera_optical_frame
     pixel_format: mjpeg2rgb
     av_device_format: YUV422P

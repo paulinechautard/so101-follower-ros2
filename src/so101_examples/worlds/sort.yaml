@@ -1,0 +1,42 @@
+frame_id: base_link
+table_z: 0.0  # detected objects lie on it
+
+colours:
+  red: &red {hsv_min: [170, 150, 60], hsv_max: [8, 255, 255]}
+  blue: &blue {hsv_min: [100, 170, 80], hsv_max: [125, 255, 255]}
+  yellow: &yellow {hsv_min: [18, 150, 100], hsv_max: [35, 255, 255]}
+  green: &green {hsv_min: [45, 120, 40], hsv_max: [85, 255, 255]}
+
+rgba:
+  red: &red_rgba [0.80, 0.06, 0.05, 1]
+  blue: &blue_rgba [0.05, 0.30, 0.80, 1]
+  yellow: &yellow_rgba [0.98, 0.78, 0.05, 1]
+  green: &green_rgba [0.05, 0.55, 0.18, 1]
+  bin: &bin_rgba [0.25, 0.25, 0.27, 1]
+
+# Duplo 2x2 brick without its studs
+duplo: &duplo [0.0318, 0.0318, 0.0192]
+bin: &bin [0.054, 0.054, 0.0008]
+stripe: &stripe [0.004, 0.044, 0.0008]
+
+objects:
+  - {id: table, size: [1.0, 1.0, 0.02], pose: [0.0, 0.0, -0.014, 0.0], mujoco: false}
+  - {id: mat, size: [0.84, 1.10, 0.0002], pose: [0.12, 0.0, 0.0001, 0.0], rgba: [0.78, 0.78, 0.76, 1], visual: true}
+
+  - {id: bin_red, bin: red, size: *bin, pose: [0.0347, 0.197, 0.0008, 1.3963], rgba: *bin_rgba, visual: true}
+  - {id: bin_red_stripe, size: *stripe, pose: [0.0401, 0.2275, 0.0008, 1.3963], rgba: *red_rgba, visual: true}
+  - {id: bin_blue, bin: blue, size: *bin, pose: [0.0939, 0.1766, 0.0008, 1.0821], rgba: *bin_rgba, visual: true}
+  - {id: bin_blue_stripe, size: *stripe, pose: [0.1085, 0.2040, 0.0008, 1.0821], rgba: *blue_rgba, visual: true}
+  - {id: bin_green, bin: green, size: *bin, pose: [0.0939, -0.1766, 0.0008, -1.0821], rgba: *bin_rgba, visual: true}
+  - {id: bin_green_stripe, size: *stripe, pose: [0.1085, -0.2040, 0.0008, -1.0821], rgba: *green_rgba, visual: true}
+  - {id: bin_yellow, bin: yellow, size: *bin, pose: [0.0347, -0.197, 0.0008, -1.3963], rgba: *bin_rgba, visual: true}
+  - {id: bin_yellow_stripe, size: *stripe, pose: [0.0401, -0.2275, 0.0008, -1.3963], rgba: *yellow_rgba, visual: true}
+
+  - {id: red_1, size: *duplo, pose: [0.2, 0.0, 0.0096, 0.2618], mass: 0.02, rgba: *red_rgba, colour: red, detect: *red}
+  - {id: blue_1, size: *duplo, pose: [0.2255, 0.0821, 0.0096, -0.1745], mass: 0.02, rgba: *blue_rgba, colour: blue, detect: *blue}
+  - {id: green_1, size: *duplo, pose: [0.1497, 0.117, 0.0096, 0.5236], mass: 0.02, rgba: *green_rgba, colour: green, detect: *green}
+  - {id: yellow_1, size: *duplo, pose: [0.2255, -0.0821, 0.0096, 0.6981], mass: 0.02, rgba: *yellow_rgba, colour: yellow, detect: *yellow}
+  - {id: red_2, size: *duplo, pose: [0.1497, -0.117, 0.0096, -0.4363], mass: 0.02, rgba: *red_rgba, colour: red, detect: *red}
+  - {id: yellow_2, size: *duplo, pose: [0.1838, 0.1838, 0.0096, 0.0873], mass: 0.02, rgba: *yellow_rgba, colour: yellow, detect: *yellow}
+  - {id: blue_2, size: *duplo, pose: [0.1838, -0.1838, 0.0096, 0.3491], mass: 0.02, rgba: *blue_rgba, colour: blue, detect: *blue}
+  - {id: green_2, size: *duplo, pose: [0.27, 0.0, 0.0096, -0.6109], mass: 0.02, rgba: *green_rgba, colour: green, detect: *green}

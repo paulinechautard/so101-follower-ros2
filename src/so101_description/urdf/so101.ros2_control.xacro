@@ -37,7 +37,7 @@
   </xacro:macro>
 
   <xacro:macro name="so101_ros2_control"
-               params="name hardware:=mock headless:=false world:=empty wrist_camera:=false
+               params="name hardware:=mock headless:=false mujoco_model:='' wrist_camera:=false
                        calibration:='' serial_port:=/dev/ttyACM0 read_only:=true dry_run:=false servo_p:=16">
     <xacro:if value="${hardware == 'real'}">
       <xacro:if value="${calibration == ''}">
@@ -57,11 +57,12 @@
         </xacro:if>
         <xacro:if value="${hardware == 'mujoco'}">
           <plugin>mujoco_ros2_control/MujocoSystemInterface</plugin>
-          <xacro:unless value="${world in ('empty', 'pick_place')}">
-            ${xacro.fatal("world must be 'empty' or 'pick_place', got '" + world + "'")}
+          <xacro:if value="${mujoco_model == ''}">
+            <param name="mujoco_model">$(find so101_description)/mjcf/scene${'_camera' if wrist_camera else ''}.xml</param>
+          </xacro:if>
+          <xacro:unless value="${mujoco_model == ''}">
+            <param name="mujoco_model">${mujoco_model}</param>
           </xacro:unless>
-          <xacro:property name="scene" value="${'scene' if world == 'empty' else world}"/>
-          <param name="mujoco_model">$(find so101_description)/mjcf/${scene}${'_camera' if wrist_camera else ''}.xml</param>
           <param name="headless">${'true' if headless else 'false'}</param>
         </xacro:if>
         <xacro:if value="${hardware == 'real'}">

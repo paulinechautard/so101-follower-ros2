@@ -5,7 +5,7 @@
     mujoco_plugins:
       wrist_camera:
         type: "mujoco_ros2_control_plugins/CameraPlugin"
-        camera_publish_rate: 15.0
+        camera_publish_rate: 5.0
         wrist_camera:
           policy: streaming
           frame_name: wrist_camera_optical_frame

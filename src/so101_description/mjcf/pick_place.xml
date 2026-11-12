@@ -1,5 +1,0 @@
-<mujoco model="pick_place">
-    <!-- scene.xml plus a cube to grasp -->
-    <include file="scene.xml" />
-    <include file="cube.xml" />
-</mujoco>

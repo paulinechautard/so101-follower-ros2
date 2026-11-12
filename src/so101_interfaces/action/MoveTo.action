@@ -1,0 +1,7 @@
+# Move the arm to one of its named states (SRDF), e.g. home
+
+string named_target
+---
+string message
+---
+string stage

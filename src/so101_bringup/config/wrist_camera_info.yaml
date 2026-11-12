@@ -1,0 +1,21 @@
+# camera_calibration's cameracalibrator
+image_width: 640
+image_height: 480
+camera_name: wrist_camera
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [556.5753095669236, 0.0, 327.17381987727447, 0.0, 554.8197399251872, 220.9719080567785, 0.0, 0.0, 1.0]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.4685520368239298, 0.23595113119699535, 0.0016288836613699532, 0.0006725135982580936, 0.0]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [461.59169277293404, 0.0, 330.86875600028924, 0.0, 0.0, 501.6408696966921, 217.65439861670683, 0.0, 0.0, 0.0, 1.0, 0.0]

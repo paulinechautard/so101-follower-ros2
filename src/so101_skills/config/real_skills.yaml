@@ -1,0 +1,4 @@
+# Overrides skills.yaml
+/**:
+  ros__parameters:
+    velocity_scaling: 0.2

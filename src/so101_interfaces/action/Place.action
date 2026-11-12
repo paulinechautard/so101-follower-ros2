@@ -1,6 +1,5 @@
-# Pick and place and object present in the scene
+# Place the object held then lift the gripper away from it.
 
-string object_id
 geometry_msgs/PoseStamped place_pose
 ---
 string message

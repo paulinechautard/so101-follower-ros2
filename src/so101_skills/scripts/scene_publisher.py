@@ -13,6 +13,7 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import ExternalShutdownException, MultiThreadedExecutor
 from rclpy.node import Node
 from shape_msgs.msg import SolidPrimitive
+from std_msgs.msg import Header
 from std_srvs.srv import Trigger
 
 # Smaller sim motions are not sent to MoveIt
@@ -44,29 +45,35 @@ class ScenePublisher(Node):
 
     def __init__(self):
         super().__init__('scene_publisher')
-        path = self.declare_parameter('scene_file', '').value
+        path = self.declare_parameter('world', '').value
         if not path:
-            raise ValueError('parameter scene_file is required')
+            raise ValueError('parameter world (a world file) is required')
+        camera = self.declare_parameter('camera', False).value
         with open(path) as f:
-            scene = yaml.safe_load(f)
-        self.frame = scene.get('frame_id', 'base_link')
+            world = yaml.safe_load(f)
+        self.frame = world.get('frame_id', 'base_link')
         self.objects = {}
-        for obj in scene['objects']:
+        for obj in world['objects']:
             if len(obj['size']) != 3 or len(obj['pose']) != 4:
                 raise ValueError(f"{obj['id']}: size must be [x, y, z], pose [x, y, z, yaw]")
-            self.objects[obj['id']] = obj
+            if not obj.get('visual'):
+                self.objects[obj['id']] = obj
 
         group = ReentrantCallbackGroup()
         self.apply_client = self.create_client(ApplyPlanningScene, '/apply_planning_scene', callback_group=group)
         self.get_client = self.create_client(GetPlanningScene, '/get_planning_scene', callback_group=group)
         self.create_service(Trigger, '~/reset', self.reset, callback_group=group)
 
-        self.tracked = {o['mujoco_body']: o['id'] for o in self.objects.values() if 'mujoco_body' in o}
+        self.detected = {i for i, o in self.objects.items() if 'detect' in o} if camera else set()
+        # Loose objects are MuJoCo bodies named after them (so101_bringup's mujoco_world)
+        self.sim_bodies = {i: i for i, o in self.objects.items() if 'mass' in o and o.get('mujoco', True)}
+        self.tracked = {b: i for b, i in self.sim_bodies.items() if i not in self.detected}
         self.sim_poses = {}  # object id -> latest pose in the sim
         self.sent_poses = {}  # object id -> pose last sent to MoveIt
         if self.tracked:
             self.create_subscription(
                 FreeJointStateArray, '/free_joint_state_publisher/free_joint_states', self.on_sim, 10)
+        if self.sim_bodies:
             sim_node = self.declare_parameter('sim_node', '/mujoco_ros2_control_node').value
             self.sim_client = self.create_client(
                 SetFreeJointState, f'{sim_node}/set_free_joint_state', callback_group=group)
@@ -86,14 +93,16 @@ class ScenePublisher(Node):
         obj.primitive_poses.append(pose)
         return obj
 
-    def apply(self, poses):
-        """poses: object id -> Pose"""
+    def apply(self, poses, remove=()):
         request = ApplyPlanningScene.Request()
         request.scene = PlanningScene(is_diff=True)
         request.scene.world.collision_objects = [self.box(i, p) for i, p in poses.items()]
+        for obj_id in remove:
+            request.scene.world.collision_objects.append(CollisionObject(
+                id=obj_id, header=Header(frame_id=self.frame), operation=CollisionObject.REMOVE))
         response = self.apply_client.call(request, timeout_sec=CALL_TIMEOUT_S)
         if response is None or not response.success:
-            self.get_logger().warn('apply_planning_scene failed')
+            self.get_logger().warning('apply_planning_scene failed')
             return False
         self.sent_poses.update(poses)
         return True
@@ -107,8 +116,9 @@ class ScenePublisher(Node):
             return None
         return {a.object.id for a in response.scene.robot_state.attached_collision_objects}
 
-    def file_poses(self):
-        return {i: pose_from_list(o['pose']) for i, o in self.objects.items()}
+    def file_poses(self, detected=False):
+        return {i: pose_from_list(o['pose']) for i, o in self.objects.items()
+                if detected or i not in self.detected}
 
     def on_sim(self, msg):
         for joint in msg.free_joints:
@@ -132,9 +142,12 @@ class ScenePublisher(Node):
                 self.get_logger().info('Waiting for move_group (/apply_planning_scene)')
                 self.waiting_logged = True
             return
-        if self.apply(self.file_poses()):
+        poses = self.file_poses()
+        if self.apply(poses):
             self.started = True
-            self.get_logger().info(f"Added {', '.join(self.objects)} to the planning scene")
+            self.get_logger().info(f"Added {', '.join(poses)} to the planning scene")
+            if self.detected:
+                self.get_logger().info(f"Left {', '.join(sorted(self.detected))} to the camera")
 
     def follow_sim(self):
         changed = {i: p for i, p in dict(self.sim_poses).items()
@@ -153,7 +166,7 @@ class ScenePublisher(Node):
         if not self.sim_client.wait_for_service(timeout_sec=1.0):
             return f'{self.sim_client.srv_name} not available'
         request = SetFreeJointState.Request()
-        for body, obj_id in self.tracked.items():
+        for body, obj_id in self.sim_bodies.items():
             joint = FreeJointState(name=body)
             joint.pose.pose = poses[obj_id]  # empty frame_id: MuJoCo's world, i.e. base_link
             request.free_joints.append(joint)
@@ -167,15 +180,15 @@ class ScenePublisher(Node):
         return ''
 
     def reset(self, request, response):
-        poses = self.file_poses()
         with self.lock:
-            error = self.move_sim_bodies(poses) if self.tracked else ''
-            if not error and not self.apply(poses):
+            error = self.move_sim_bodies(self.file_poses(detected=True)) if self.sim_bodies else ''
+            # The detected objects leave the scene until the camera sees them again.
+            if not error and not self.apply(self.file_poses(), remove=self.detected):
                 error = 'apply_planning_scene failed'
         response.success = not error
         response.message = error
         if error:
-            self.get_logger().warn(f'reset: {error}')
+            self.get_logger().warning(f'reset: {error}')
         return response
 
 

@@ -1,3 +1,6 @@
+import os
+
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction, Shutdown
 from launch.conditions import IfCondition
@@ -5,13 +8,13 @@ from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitut
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
+from so101_bringup.mujoco_world import write_mjcf
 
 CONTROL_NODE_PACKAGE = {
     'mock': 'controller_manager',
     'mujoco': 'mujoco_ros2_control',
     'real': 'controller_manager',
 }
-WORLDS = ['empty', 'pick_place']  # mjcf/scene.xml, mjcf/pick_place.xml
 
 
 def launch_setup(context):
@@ -24,6 +27,10 @@ def launch_setup(context):
             f"hardware must be one of {list(CONTROL_NODE_PACKAGE)}, got '{hardware}'")
     world = LaunchConfiguration('world').perform(context)
     wrist_camera = LaunchConfiguration('wrist_camera').perform(context) == 'true'
+    mujoco_model = ''
+    if hardware == 'mujoco' and world:
+        mjcf_dir = os.path.join(get_package_share_directory('so101_description'), 'mjcf')
+        mujoco_model = write_mjcf(world, mjcf_dir, wrist_camera)
     use_sim_time = {'use_sim_time': hardware == 'mujoco'}
     read_only = hardware == 'real' and LaunchConfiguration('read_only').perform(context) == 'true'
 
@@ -34,7 +41,7 @@ def launch_setup(context):
             ' wrist_camera:=', LaunchConfiguration('wrist_camera'),
             ' hardware:=', hardware,
             ' headless:=', LaunchConfiguration('headless'),
-            ' world:=', world,
+            ' mujoco_model:=', mujoco_model,
             ' calibration:=', LaunchConfiguration('calibration'),
             ' serial_port:=', LaunchConfiguration('serial_port'),
             ' read_only:=', LaunchConfiguration('read_only'),
@@ -102,8 +109,8 @@ def generate_launch_description():
             description='hardware:=mujoco only: run without the MuJoCo viewer window',
         ),
         DeclareLaunchArgument(
-            'world', default_value='empty', choices=WORLDS,
-            description="hardware:=mujoco only: 'empty', or 'pick_place' (adds a cube to grasp)",
+            'world', default_value='',
+            description='hardware:=mujoco only: world file (YAML) of the objects to add, e.g. so101_examples/worlds/sort.yaml',
         ),
         DeclareLaunchArgument(
             'calibration', default_value='',

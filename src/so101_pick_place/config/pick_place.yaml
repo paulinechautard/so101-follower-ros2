@@ -1,8 +1,0 @@
-/**:
-  ros__parameters:
-    grasp_depth: 0.015       
-    approach_height: 0.06    
-    jaw_clearance: 0.005     
-    yaw_offset: 0.0          
-    velocity_scaling: 0.3
-    max_joint_step: 0.15

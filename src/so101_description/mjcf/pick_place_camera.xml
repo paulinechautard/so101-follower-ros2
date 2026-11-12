@@ -1,5 +1,0 @@
-<mujoco model="pick_place_camera">
-    <!-- scene_camera.xml plus a cube to grasp -->
-    <include file="scene_camera.xml" />
-    <include file="cube.xml" />
-</mujoco>

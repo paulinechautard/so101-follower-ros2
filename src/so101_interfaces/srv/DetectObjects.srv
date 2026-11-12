@@ -1,0 +1,8 @@
+# Locate objects with the camera and put them in MoveIt's planning scene
+
+string[] object_ids  # the objects the detector knows
+---
+bool success         
+string message
+string[] found_ids
+geometry_msgs/PoseStamped[] poses  

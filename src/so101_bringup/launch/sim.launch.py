@@ -34,8 +34,8 @@ def generate_launch_description():
             description='sim:=mujoco only: run without the MuJoCo viewer window',
         ),
         DeclareLaunchArgument(
-            'world', default_value='empty', choices=['empty', 'pick_place'],
-            description="sim:=mujoco only: 'pick_place' adds a cube to grasp",
+            'world', default_value='',
+            description='sim:=mujoco only: world file (YAML) of the objects to add, e.g. so101_examples/worlds/sort.yaml',
         ),
         common,
     ])

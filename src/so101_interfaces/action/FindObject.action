@@ -1,0 +1,9 @@
+# Locate an object
+
+string object_id
+geometry_msgs/PointStamped look_at
+---
+string message
+geometry_msgs/PoseStamped object_pose 
+---
+string stage

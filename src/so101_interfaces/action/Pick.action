@@ -1,0 +1,9 @@
+# Grasp an object of MoveIt's planning scene from above and lift it.
+# The arm stays above the pick spot until a Place goal is sent.
+
+string object_id
+---
+string message
+geometry_msgs/PoseStamped object_pose
+---
+string stage

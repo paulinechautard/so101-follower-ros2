@@ -6,7 +6,11 @@ find_package(geometry_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  action/PickPlace.action
+  action/FindObject.action
+  action/MoveTo.action
+  action/Pick.action
+  action/Place.action
+  srv/DetectObjects.srv
   DEPENDENCIES geometry_msgs
 )
 
